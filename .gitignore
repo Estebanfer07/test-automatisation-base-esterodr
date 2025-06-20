@@ -21,3 +21,5 @@ karate-reports/
 # Otros
 *.iml
 .idea/
+
+bin/
