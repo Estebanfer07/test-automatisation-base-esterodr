@@ -12,12 +12,35 @@ Feature: Test de API súper simple
     * configure ssl = true
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/esterodr/api/characters'
 
-  Scenario: Crear un personaje
-    When request character
-    And method post
-    Then status 201
-    * print response
-    And match response contains character
-    And match response.id == '#number'
+    @Create-HappyPath
+    Scenario: Crear un personaje
+      When request character
+      And method post
+      Then status 201
+      * print response
+      And match response contains character
+      And match response.id == '#number'
+      
+    @GetAll-HappyPath
+    Scenario: Obtener todos los personajes
+      When method get
+      Then status 200
+      * print response
+      And match response != null
+      And assert response.length > 0
+      
+    @GetById-HappyPath
+    Scenario: Obtener personaje por id
+      * call read('classpath:get-first-character.feature')
+      * def dbCharacter = firstCharacter
+      * def characterId = dbCharacter.id
+      * print 'ID del personaje a buscar:', characterId
+      
+      And path characterId
+      When method get
+      Then status 200
+      * print 'Personaje encontrado:', response
+      And match response contains dbCharacter
 
-  
+    
+
