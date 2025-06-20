@@ -21,8 +21,8 @@ Feature: Test de API súper simple
     
     @Create-Error-AlreadyExists
     Scenario: Error => Crear un personaje con nombre ya existente
-      * call read('classpath:get-first-character.feature')
-      * def dbCharacter = firstCharacter
+      * call read('classpath:utils/get-last-created-character.feature')
+      * def dbCharacter = lastCharacterCreated
       * character.name = dbCharacter.name
 
       When request character
@@ -52,8 +52,8 @@ Feature: Test de API súper simple
       
     @GetById-HappyPath
     Scenario: Obtener personaje por id
-      * call read('classpath:get-first-character.feature')
-      * def dbCharacter = firstCharacter
+      * call read('classpath:utils/get-last-created-character.feature')
+      * def dbCharacter = lastCharacterCreated
       * def characterId = dbCharacter.id
       * print 'ID del personaje a buscar:', characterId
       
@@ -69,12 +69,13 @@ Feature: Test de API súper simple
       And path -1
       When method get
       Then status 404
+      And match response.error == "Character not found"
       
     @Update-HappyPath
     Scenario: Actualizar personaje
       * def editedDescription = "descripción editada"
-      * call read('classpath:get-first-character.feature')
-      * def dbCharacter = firstCharacter
+      * call read('classpath:utils/get-last-created-character.feature')
+      * def dbCharacter = lastCharacterCreated
       * def characterId = dbCharacter.id
       * dbCharacter.description = editedDescription
       * print 'ID del personaje a editar:', characterId
@@ -87,4 +88,30 @@ Feature: Test de API súper simple
       * print 'Personaje editado:', response
       And match response contains dbCharacter
     
-    
+    @Update-Error-NotFound
+    Scenario: Error => Actualizar personaje inexistente
+      And path -1
+      When request character
+      And method put
+      Then status 404
+      And match response.error == "Character not found"
+      
+    @Delete-HappyPath
+    Scenario: Eliminar personaje creado
+      * call read('classpath:utils/get-last-created-character.feature')
+      * def dbCharacter = lastCharacterCreated
+      * def characterId = dbCharacter.id
+      * print 'ID del personaje a eliminar:', characterId
+
+      And path characterId
+      When method delete
+      Then status 204
+      * print 'Personaje eliminado:', characterId
+
+    @Delete-Error-NotFound
+    Scenario: Error => Eliminar personaje inexistente
+      And path -1
+      When request character
+      And method put
+      Then status 404
+      And match response.error == "Character not found"
