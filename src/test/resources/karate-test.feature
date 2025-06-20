@@ -20,7 +20,7 @@ Feature: Test de API súper simple
       And match response.id == '#number'
     
     @Create-Error-AlreadyExists
-    Scenario: Crear un personaje con nombre ya existente
+    Scenario: Error => Crear un personaje con nombre ya existente
       * call read('classpath:get-first-character.feature')
       * def dbCharacter = firstCharacter
       * character.name = dbCharacter.name
@@ -32,7 +32,7 @@ Feature: Test de API súper simple
       And match response.error == "Character name already exists"
     
     @Create-Error-MissingFields
-    Scenario: Crear un personaje sin enviar la información necesaria
+    Scenario: Error => Crear un personaje sin enviar la información necesaria
       When request {}
       And method post
       Then status 400
@@ -64,10 +64,27 @@ Feature: Test de API súper simple
       And match response contains dbCharacter
 
 
-      @GetById-NotFound
-      Scenario: Obtener personaje por id
-        And path -1
-        When method get
-        Then status 404
+    @GetById-Error-NotFound
+    Scenario: Error => Obtener personaje por id inexistente
+      And path -1
+      When method get
+      Then status 404
       
-   
+    @Update-HappyPath
+    Scenario: Actualizar personaje
+      * def editedDescription = "descripción editada"
+      * call read('classpath:get-first-character.feature')
+      * def dbCharacter = firstCharacter
+      * def characterId = dbCharacter.id
+      * dbCharacter.description = editedDescription
+      * print 'ID del personaje a editar:', characterId
+      * print 'personaje por editar:', dbCharacter
+    
+      And path characterId
+      When request dbCharacter
+      And method put
+      Then status 200
+      * print 'Personaje editado:', response
+      And match response contains dbCharacter
+    
+    
