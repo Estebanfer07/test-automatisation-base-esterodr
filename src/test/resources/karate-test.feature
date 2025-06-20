@@ -55,4 +55,10 @@ Feature: Test de API súper simple
       And match response contains dbCharacter
 
 
-
+      @GetById-NotFound
+      Scenario: Obtener personaje por id
+        And path -1
+        When method get
+        Then status 404
+      
+   
