@@ -20,6 +20,18 @@ Feature: Test de API súper simple
       * print response
       And match response contains character
       And match response.id == '#number'
+    
+    @Create-Error-AlreadyExists
+    Scenario: Crear un personaje con nombre ya existente
+      * call read('classpath:get-first-character.feature')
+      * def dbCharacter = firstCharacter
+      * character.name = dbCharacter.name
+
+      When request character
+      And method post
+      Then status 400
+      * print response
+      And match response.error == "Character name already exists"
       
     @GetAll-HappyPath
     Scenario: Obtener todos los personajes
@@ -42,5 +54,5 @@ Feature: Test de API súper simple
       * print 'Personaje encontrado:', response
       And match response contains dbCharacter
 
-    
+
 
