@@ -3,17 +3,15 @@ Feature: Test de API súper simple
   Background:
     # personaje base
     * def character = read('classpath:data/karate-test/example-character.json')
-
-    # Agregar sufijo para evitar duplicidad de nombre
-    * def uuid = java.util.UUID.randomUUID().toString().substring(0, 8)
-    * set character.name = character.name + '-' + uuid
-    * print 'Unique character name:', character.name
-    
     * configure ssl = true
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/esterodr/api/characters'
 
     @Create-HappyPath
     Scenario: Crear un personaje
+      # Agregar sufijo para evitar duplicidad de nombre
+      * def uuid = java.util.UUID.randomUUID().toString().substring(0, 8)
+      * set character.name = character.name + '-' + uuid
+      * print 'Unique character name:', character.name
       When request character
       And method post
       Then status 201
@@ -32,6 +30,17 @@ Feature: Test de API súper simple
       Then status 400
       * print response
       And match response.error == "Character name already exists"
+    
+    @Create-Error-MissingFields
+    Scenario: Crear un personaje sin enviar la información necesaria
+      When request {}
+      And method post
+      Then status 400
+      * print response
+      And match response.name == "Name is required"
+      And match response.alterego == "Alterego is required"
+      And match response.description == "Description is required"
+      And match response.powers == "Powers are required"
       
     @GetAll-HappyPath
     Scenario: Obtener todos los personajes
