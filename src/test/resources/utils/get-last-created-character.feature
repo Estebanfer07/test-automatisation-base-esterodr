@@ -9,5 +9,5 @@ Feature: Obtener primer personaje de la lista
     When method get
     Then status 200
     And assert response.length > 0
-    * def first = response[0]
-    * karate.set('firstCharacter', first)
+    * def lastCreated = response.reduce(function(a, b) { return a.id > b.id ? a : b })
+    * karate.set('lastCharacterCreated', lastCreated)
